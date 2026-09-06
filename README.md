@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HIMTI KIT
+
+A web application for HIMTI BINUS students to access lesson summaries and software resources.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
+cp .env.example .env.local
+npm run db:migrate
+npm run db:seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The native workflow requires PostgreSQL matching `DATABASE_URL`. The development seed creates student NIM `2500000000` in `Binusian 25`, plus representative Computer Science summaries and software links.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Docker
 
-## Learn More
+Docker Desktop users running this repository in WSL must enable integration for the repository's WSL distribution.
 
-To learn more about Next.js, take a look at the following resources:
+Start the local development server with hot reload:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+docker compose up --build
+docker compose exec app npm run db:seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000). Stop and remove the containers with:
 
-## Deploy on Vercel
+```bash
+docker compose down
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Rebuild the image after changing `package.json` or `package-lock.json` so the container's `node_modules` volume is refreshed:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+docker compose down --volumes
+docker compose up --build
+```
+
+The Docker workflow runs Next.js and PostgreSQL for development. Compose defaults the admin login to `admin` / `change-me`; override `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `SESSION_SECRET` in your environment before using shared or exposed environments. Administrators manage the student NIM allowlist, persisted cohorts, and cohort-scoped Course and Software resources through `/admin`. The production image remains deferred until deployment requirements are confirmed.
+
+Student cohorts are inferred from the first two digits of each ten-digit NIM (`28xxxxxxxx` becomes `Binusian 28`). The admin allowlist accepts individual entries or a CSV file up to 1 MB with this format:
+
+```csv
+name,nim
+Jane Student,2800000000
+John Student,2900000000
+```
+
+CSV imports create missing inferred cohorts and update existing NIMs. Validation is transactional, so an invalid row leaves the allowlist unchanged.
+
+## Checks
+
+```bash
+npm run lint
+npm test
+npm run build
+```
+
+See [docs/plan.md](docs/plan.md) for the development plan.

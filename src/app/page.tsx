@@ -1,69 +1,71 @@
-import Image from "next/image";
+"use client";
+
+import { useActionState } from "react";
+import { studentLogin } from "@/app/actions/auth";
 
 export default function Home() {
+  const [state, action, pending] = useActionState(studentLogin, {});
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+    <main className="relative isolate flex min-h-svh overflow-hidden bg-[#071127] bg-[url('/bg.png')] bg-cover bg-center font-mono text-white">
+      <div className="absolute inset-0 -z-10 bg-[#071127]/10" aria-hidden="true" />
+
+      <section className="mx-auto flex w-full max-w-4xl flex-col items-center px-5 pt-[18svh] text-center sm:px-8 sm:pt-[22svh] lg:pt-[24svh]">
+        <h1 className="text-3xl font-medium tracking-[0.12em] text-balance sm:text-5xl">
+          HIMTI KIT
+        </h1>
+        <p className="mt-5 max-w-3xl text-sm leading-relaxed text-pretty text-white sm:text-lg sm:leading-relaxed">
+          HIMTI KIT is a learning kit for students in the School of Computer
+          Science at Bina Nusantara University. Access your study materials
+          online in one place.
+        </p>
+
+        <form
+          action={action}
+          className="mt-7 w-full max-w-2xl text-left sm:mt-8"
+        >
+          <label className="sr-only" htmlFor="nim">
+            Student ID (NIM)
+          </label>
+          <div className="flex h-14 overflow-hidden rounded-full bg-[#f0f1f4] text-[#11131b] shadow-[0_0_24px_rgba(65,218,255,0.12)] sm:h-16">
+            <input
+              autoComplete="username"
+              className="min-w-0 flex-1 bg-transparent px-5 text-sm outline-none placeholder:text-[#393b43] focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-[#14d5e5] sm:px-7 sm:text-base"
+              id="nim"
+              inputMode="numeric"
+              name="nim"
+              placeholder="Insert your Student ID (NIM)"
+              required
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <button
+              aria-label="Continue"
+              className="flex w-16 shrink-0 items-center justify-center bg-[#9ea1ad] transition-colors hover:bg-[#b3b6c0] focus-visible:outline-4 focus-visible:outline-offset-[-4px] focus-visible:outline-[#14d5e5] sm:w-20"
+              disabled={pending}
+              type="submit"
+            >
+              <svg
+                aria-hidden="true"
+                className="h-7 w-7 sm:h-8 sm:w-8"
+                fill="none"
+                viewBox="0 0 48 48"
+              >
+                <path
+                  d="M8 24h30m-11-11 11 11-11 11"
+                  stroke="currentColor"
+                  strokeLinecap="square"
+                  strokeWidth="4"
+                />
+              </svg>
+            </button>
+          </div>
+          <p
+            aria-live="polite"
+            className="mt-2 min-h-5 text-sm font-sans text-white"
           >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            {pending ? "Checking Student ID..." : state.error}
+          </p>
+        </form>
+      </section>
+    </main>
   );
 }
