@@ -8,7 +8,7 @@ const client = new pg.Client({ connectionString: databaseUrl });
 await client.connect();
 try {
   await client.query(await readFile("db/seed.sql", "utf8"));
-  console.log("Development seed applied");
+  console.log("No application data seeded; admin credentials are configured through environment variables");
 } finally {
   await client.end();
 }

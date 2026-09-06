@@ -191,7 +191,7 @@ Confirmed repository state at the end of Stage 1:
 - Current scripts: `npm run dev`, `npm run build`, `npm run start`, and `npm run lint`.
 - The application provides database-backed student Course and Software libraries, authenticated identity, logout confirmation, and persisted admin management interfaces.
 - A verified local development Docker workflow runs Next.js and PostgreSQL with source hot reload and isolated dependency/build-cache volumes.
-- PostgreSQL migrations, development seed data, signed role sessions, protected routes, cohort-scoped reads, validated content CRUD, and focused tests are implemented; a production Docker image remains pending.
+- PostgreSQL migrations, environment-configured admin credentials, signed role sessions, protected routes, cohort-scoped reads, validated content CRUD, and focused tests are implemented; a production Docker image remains pending.
 
 Before changing Next.js code, read the relevant documentation in `node_modules/next/dist/docs/` as required by the repository-level `AGENTS.md`. Do not rely on conventions from older Next.js versions.
 
@@ -302,7 +302,7 @@ Implementation steps:
 4. Model student identity/cohort mapping if required by the confirmed student-access mechanism.
 5. Model lesson summaries and software resources with explicit cohort association.
 6. Add foreign-key restrictions that prevent removal of a cohort while students or content reference it, along with other constraints, nullability, and indexes based on actual query paths.
-7. Create migrations and a minimal development seed only if representative data is needed.
+7. Create migrations without seeding cohorts, students, courses, or software; bootstrap admin credentials remain environment-configured.
 8. Implement student access and session handling according to the confirmed mechanism.
 9. Implement the separate secure admin authentication flow.
 10. Implement server-enforced route protection and authorization.
@@ -494,3 +494,4 @@ Record future product-owner decisions here with the date and enough context to p
 | 2026-09-06 | Administrators manage the student NIM allowlist with a name and cohort assignment; `0000000000` remains reserved for the admin trigger. | Makes student access operational without weakening the separate admin authentication flow. |
 | 2026-09-06 | Ten-digit NIM prefixes infer shortened cohort names such as `28` to `Binusian 28`; CSV imports use `name,nim`, create missing cohorts, update existing NIMs, and commit only when every row is valid. | Removes manual cohort assignment and defines deterministic bulk allowlist behavior. |
 | 2026-09-06 | Use a PostgreSQL student roster with explicit cohort assignment, environment-configured bootstrap administrator credentials, and external resource links only. | Resolves Stage 3 identity, cohort mapping, and resource-storage decisions. |
+| 2026-09-07 | Keep the database seed free of cohorts, students, courses, and software; administrator credentials remain environment-configured. | New installations start with empty managed content and no sample student access. |

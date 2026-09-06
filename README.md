@@ -14,7 +14,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-The native workflow requires PostgreSQL matching `DATABASE_URL`. The development seed creates student NIM `2500000000` in `Binusian 25`, plus representative Computer Science summaries and software links.
+The native workflow requires PostgreSQL matching `DATABASE_URL`. Admin credentials come from `ADMIN_USERNAME` and `ADMIN_PASSWORD`; the seed command does not create cohorts, students, courses, or software resources.
 
 ## Docker
 
