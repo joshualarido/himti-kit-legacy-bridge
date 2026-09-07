@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "HIMTI KIT",
   description: "Learning resources for HIMTI BINUS students",
+  icons: {
+    icon: "/himti-fav.svg",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

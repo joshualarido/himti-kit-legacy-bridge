@@ -72,3 +72,36 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+            cd /opt/himti-platform
+            docker compose --profile prod pull himti-kit-prod
+            docker compose --profile prod up -d --no-deps himti-kit-prod
+
+            for attempt in $(seq 1 18); do
+              container_id=$(docker compose --profile prod ps -q himti-kit-prod)
+              status=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container_id")
+              [ "$status" = "healthy" ] && break
+              [ "$status" = "unhealthy" ] && break
+              sleep 5
+            done
+
+            if [ "$status" != "healthy" ]; then
+              docker compose --profile prod logs --tail 100 himti-kit-prod
+              exit 1
+            fi
+
+            curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors \
+              https://himtikit.himtibinus.or.id/ > /dev/null

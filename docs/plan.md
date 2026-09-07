@@ -363,11 +363,7 @@ Stage 4 acceptance criteria:
 
 ### Stage 5: Prepare and Verify Deployment
 
-Status: **Not started**
-
-Dependencies:
-
-- Confirm production hosting and database providers.
+Status: **Implemented; automatic deployment verification pending**
 
 Implementation steps:
 
@@ -469,11 +465,11 @@ The project is complete only when:
 - [x] Stage 2: Build the reference-driven interface (additional browser visual/accessibility verification declined)
 - [x] Stage 3: Add PostgreSQL and authentication
 - [x] Stage 4: Connect content and admin CRUD
-- [ ] Stage 5: Prepare and verify deployment (production image publishing implemented; VPS rollout pending)
+- [ ] Stage 5: Prepare and verify deployment (production rollout complete; automatic deployment verification pending)
 
 ## Next Action
 
-Publish and verify the production image, then configure and smoke-test the VPS Compose and Caddy deployment.
+Push the automatic deployment workflow to `main`, then confirm its VPS health check and production URL check pass.
 
 ## Decision Log
 
@@ -496,3 +492,4 @@ Record future product-owner decisions here with the date and enough context to p
 | 2026-09-06 | Use a PostgreSQL student roster with explicit cohort assignment, environment-configured bootstrap administrator credentials, and external resource links only. | Resolves Stage 3 identity, cohort mapping, and resource-storage decisions. |
 | 2026-09-07 | Keep the database seed free of cohorts, students, courses, and software; administrator credentials remain environment-configured. | New installations start with empty managed content and no sample student access. |
 | 2026-09-07 | Publish an amd64 production image to GHCR after PostgreSQL-backed checks pass on `main`; the VPS pulls the image rather than storing application source. | Establishes the first half of the production CI/CD path while keeping deployment configuration centralized on the VPS. |
+| 2026-09-07 | After a successful `main` image publication, deploy over SSH by recreating only `himti-kit-prod`, then verify container health and the public URL. | Completes automatic production deployment without copying source, rewriting VPS secrets, or restarting Caddy. |

@@ -40,7 +40,7 @@ docker compose down --volumes
 docker compose up --build
 ```
 
-The Docker workflow runs Next.js and PostgreSQL for development. Compose defaults the admin login to `admin` / `change-me`; override `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `SESSION_SECRET` in your environment before using shared or exposed environments. Administrators manage the student NIM allowlist, persisted cohorts, and cohort-scoped Course and Software resources through `/admin`. The production image remains deferred until deployment requirements are confirmed.
+The Docker workflow runs Next.js and PostgreSQL for development. Compose defaults the admin login to `admin` / `change-me`; override `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `SESSION_SECRET` in your environment before using shared or exposed environments. Administrators manage the student NIM allowlist, persisted cohorts, and cohort-scoped Course and Software resources through `/admin`.
 
 Student cohorts are inferred from the first two digits of each ten-digit NIM (`28xxxxxxxx` becomes `Binusian 28`). The admin allowlist accepts individual entries or a CSV file up to 1 MB with this format:
 
@@ -68,6 +68,8 @@ Pushes to `main` run migrations and tests against PostgreSQL, lint and build the
 ghcr.io/joshualarido/himti-kit-legacy-bridge:prod
 ```
 
-The image listens on port `3000`, runs database migrations before startup, and requires `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD` at runtime. It is intended to run behind a reverse proxy and should not publish port `3000` directly to the internet.
+The image listens on port `3000`, runs database migrations before startup, and requires `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD` at runtime. The PostgreSQL container also uses `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`. In production, `DATABASE_URL` must use the Compose database service hostname (`himti-kit-postgres-prod`) instead of `localhost`.
+
+After publishing, the workflow deploys the image to the existing `himti-kit-prod` service in `/opt/himti-platform` and verifies its container health and public URL. Deployment requires the `VPS_HOST`, `VPS_USERNAME`, and `VPS_SSH_KEY` GitHub Actions secrets. The public GHCR image does not require registry credentials on the VPS.
 
 See [docs/plan.md](docs/plan.md) for the development plan.
