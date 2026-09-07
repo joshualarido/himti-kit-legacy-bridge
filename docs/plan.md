@@ -46,7 +46,7 @@ The application should reproduce the supplied interfaces closely on desktop whil
 ### Admin Content Management
 
 - An administrator selects the Binusian cohort whose content is being managed.
-- An administrator can create and remove cohorts from the admin panel; supported cohort values must not be hard-coded.
+- An administrator can create and remove cohorts from the admin panel by entering a two-digit Binusian batch from `01` to `99`; the displayed name is always `Binusian XX`.
 - A cohort must not be removed while any student, lesson summary, or software resource is associated with it. The admin interface must explain why removal is blocked.
 - An administrator can create, view, edit, and delete lesson summaries.
 - An administrator can create, view, edit, and delete software resources.
@@ -167,7 +167,7 @@ Confirmed extension beyond the screenshot:
 
 - A student's cohort controls which lesson summaries and resources are available to that student.
 - An admin's selected cohort controls which records are viewed and modified in the management interface.
-- Cohorts are persisted, admin-managed records rather than a hard-coded list.
+- Cohorts are persisted, admin-managed two-digit batches rather than a hard-coded list or freely named records.
 - Cohort removal is restricted while students or content reference that cohort; associated records must first be removed or reassigned.
 - The student Course and Software areas are distinct views.
 - The admin Manage Course and Manage Software areas are distinct views.
@@ -326,10 +326,10 @@ Status: **Complete**
 Implemented:
 
 - Student identity and content are resolved from the signed session and assigned cohort.
-- Lesson summaries are filtered by cohort and one of the ten supported majors; software resources are cohort-wide.
+- Lesson summaries are assigned to one or more of the ten supported majors and filtered by cohort and selected major; software resources are cohort-wide.
 - Resource cards use persisted titles, descriptions, validated external image URLs, and validated external resource URLs.
 - Admin student allowlist management, cohort selection, cohort creation and restricted removal, and Course/Software create, edit, and confirmed delete operations persist to PostgreSQL.
-- Manual and CSV allowlist input derives `Binusian XX` from the first two digits of each ten-digit NIM; missing cohorts are created automatically.
+- Manual and CSV allowlist input derives `Binusian XX` from the first two digits of each ten-digit NIM and rejects students whose cohort has not been created by an administrator.
 - CSV imports require `name,nim`, support standard quoted values, update existing NIMs, and reject invalid files transactionally without partial writes.
 - Server Actions independently enforce admin authorization, input validation, and cohort-scoped update/delete predicates.
 - Empty, loading, operation-status, and student query-failure states are implemented.
@@ -493,3 +493,4 @@ Record future product-owner decisions here with the date and enough context to p
 | 2026-09-07 | Keep the database seed free of cohorts, students, courses, and software; administrator credentials remain environment-configured. | New installations start with empty managed content and no sample student access. |
 | 2026-09-07 | Publish an amd64 production image to GHCR after PostgreSQL-backed checks pass on `main`; the VPS pulls the image rather than storing application source. | Establishes the first half of the production CI/CD path while keeping deployment configuration centralized on the VPS. |
 | 2026-09-07 | After a successful `main` image publication, deploy over SSH by recreating only `himti-kit-prod`, then verify container health and the public URL. | Completes automatic production deployment without copying source, rewriting VPS secrets, or restarting Caddy. |
+| 2026-09-07 | Cohorts are two-digit batches with canonical `Binusian XX` names; student imports require an existing batch, and courses may target multiple majors. | Removes duplicate free-text cohorts and expands course visibility without duplicating resources. |

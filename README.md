@@ -42,7 +42,7 @@ docker compose up --build
 
 The Docker workflow runs Next.js and PostgreSQL for development. Compose defaults the admin login to `admin` / `change-me`; override `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `SESSION_SECRET` in your environment before using shared or exposed environments. Administrators manage the student NIM allowlist, persisted cohorts, and cohort-scoped Course and Software resources through `/admin`.
 
-Student cohorts are inferred from the first two digits of each ten-digit NIM (`28xxxxxxxx` becomes `Binusian 28`). The admin allowlist accepts individual entries or a CSV file up to 1 MB with this format:
+Student cohorts use a two-digit Binusian batch created by an administrator. The first two digits of each ten-digit NIM select that existing cohort (`28xxxxxxxx` uses `Binusian 28`). The admin allowlist accepts individual entries or a CSV file up to 1 MB with this format:
 
 ```csv
 name,nim
@@ -50,7 +50,7 @@ Jane Student,2800000000
 John Student,2900000000
 ```
 
-CSV imports create missing inferred cohorts and update existing NIMs. Validation is transactional, so an invalid row leaves the allowlist unchanged.
+CSV imports update existing NIMs but do not create cohorts. Every inferred batch must already exist; validation is transactional, so an invalid row leaves the allowlist unchanged. Course resources can be assigned to one or more supported majors.
 
 ## Checks
 
@@ -70,6 +70,8 @@ ghcr.io/joshualarido/himti-kit-legacy-bridge:prod
 
 The image listens on port `3000`, runs database migrations before startup, and requires `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD` at runtime. The PostgreSQL container also uses `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`. In production, `DATABASE_URL` must use the Compose database service hostname (`himti-kit-postgres-prod`) instead of `localhost`.
 
-After publishing, the workflow deploys the image to the existing `himti-kit-prod` service in `/opt/himti-platform` and verifies its container health and public URL. Deployment requires the `VPS_HOST`, `VPS_USERNAME`, and `VPS_SSH_KEY` GitHub Actions secrets. The public GHCR image does not require registry credentials on the VPS.
+After publishing, the workflow runs pending migrations from the new image, deploys it to the existing `himti-kit-prod` service in `/opt/himti-platform`, and verifies its container health and public URL. A failed migration stops deployment before the running container is replaced. Deployment requires the `VPS_HOST`, `VPS_USERNAME`, and `VPS_SSH_KEY` GitHub Actions secrets. The public GHCR image does not require registry credentials on the VPS.
+
+Take a PostgreSQL backup before deploying a schema migration. Migrations are transactional and forward-only; a successful breaking migration can make the previous application image incompatible with the database while the replacement container starts.
 
 See [docs/plan.md](docs/plan.md) for the development plan.

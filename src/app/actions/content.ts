@@ -21,7 +21,7 @@ function destination(type: ContentType, cohortId: string, status: string) {
 function databaseMessage(error: unknown) {
   const code = typeof error === "object" && error && "code" in error ? error.code : undefined;
   if (code === "23503") return "The selected cohort no longer exists.";
-  if (code === "23505") return "A resource with this title already exists in that cohort and major.";
+  if (code === "23505") return "A resource with this title already exists in that cohort.";
   return "The resource could not be saved. Please try again.";
 }
 
@@ -35,18 +35,18 @@ export async function saveContent(formData: FormData) {
   const parsed = validateContent(formData, type);
   if (!parsed.ok) redirect(destination(type, cohortId, parsed.error));
 
-  const { title, description, imageUrl, resourceUrl, major } = parsed.data;
+  const { title, description, imageUrl, resourceUrl, majors } = parsed.data;
   let status = id ? "Resource updated." : "Resource added.";
   try {
     if (type === "course") {
       const result = id
         ? await db.query(
-            "UPDATE lesson_summaries SET title = $1, description = $2, image_url = $3, resource_url = $4, major = $5 WHERE id = $6 AND cohort_id = $7",
-            [title, description, imageUrl, resourceUrl, major, id, cohortId],
+            "UPDATE lesson_summaries SET title = $1, description = $2, image_url = $3, resource_url = $4, majors = $5 WHERE id = $6 AND cohort_id = $7",
+            [title, description, imageUrl, resourceUrl, majors, id, cohortId],
           )
         : await db.query(
-            "INSERT INTO lesson_summaries (cohort_id, title, description, image_url, resource_url, major) VALUES ($1, $2, $3, $4, $5, $6)",
-            [cohortId, title, description, imageUrl, resourceUrl, major],
+            "INSERT INTO lesson_summaries (cohort_id, title, description, image_url, resource_url, majors) VALUES ($1, $2, $3, $4, $5, $6)",
+            [cohortId, title, description, imageUrl, resourceUrl, majors],
           );
       if (id && result.rowCount === 0) status = "Resource was not found in the selected cohort.";
     } else {

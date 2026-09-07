@@ -88,6 +88,7 @@ jobs:
             set -e
             cd /opt/himti-platform
             docker compose --profile prod pull himti-kit-prod
+            docker compose --profile prod run --rm --no-deps himti-kit-prod node scripts/migrate.mjs
             docker compose --profile prod up -d --no-deps himti-kit-prod
 
             for attempt in $(seq 1 18); do

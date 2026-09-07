@@ -1,14 +1,14 @@
 import { parse } from "csv-parse/sync";
 
 export type StudentRecord = { id: string; nim: string; name: string; cohortId: string; cohortName: string };
-export type StudentInput = { nim: string; name: string; cohortName: string };
+export type StudentInput = { nim: string; name: string; cohortBatch: number };
 
 type StudentValidation =
   | { ok: false; error: string }
   | { ok: true; data: StudentInput };
 
-export function inferCohortName(nim: string) {
-  return `Binusian ${nim.slice(0, 2)}`;
+export function inferCohortBatch(nim: string) {
+  return Number(nim.slice(0, 2));
 }
 
 export function validateStudentData(name: string, nim: string): StudentValidation {
@@ -16,8 +16,9 @@ export function validateStudentData(name: string, nim: string): StudentValidatio
   const cleanNim = nim.trim();
   if (!/^\d{10}$/.test(cleanNim)) return { ok: false, error: "NIM must contain exactly 10 digits." };
   if (cleanNim === "0000000000") return { ok: false, error: "That NIM is reserved for the admin login trigger." };
+  if (cleanNim.startsWith("00")) return { ok: false, error: "The NIM batch must be between 01 and 99." };
   if (!cleanName || cleanName.length > 120) return { ok: false, error: "Name must be between 1 and 120 characters." };
-  return { ok: true, data: { nim: cleanNim, name: cleanName, cohortName: inferCohortName(cleanNim) } };
+  return { ok: true, data: { nim: cleanNim, name: cleanName, cohortBatch: inferCohortBatch(cleanNim) } };
 }
 
 export function validateStudent(formData: FormData) {

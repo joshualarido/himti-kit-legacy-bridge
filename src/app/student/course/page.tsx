@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { isMajor, MAJORS } from "@/lib/content";
 import { requireStudent } from "@/lib/session";
+import MajorSelector from "./major-selector";
 
 type Summary = { id: string; title: string; description: string; image_url: string; resource_url: string };
 
@@ -9,21 +10,13 @@ export default async function StudentCoursePage({ searchParams }: { searchParams
   const requestedMajor = (await searchParams).major ?? "";
   const major = isMajor(requestedMajor) ? requestedMajor : MAJORS[0];
   const result = await db.query<Summary>(
-    "SELECT id::text, title, description, image_url, resource_url FROM lesson_summaries WHERE cohort_id = $1 AND major = $2 ORDER BY title",
+    "SELECT id::text, title, description, image_url, resource_url FROM lesson_summaries WHERE cohort_id = $1 AND $2 = ANY(majors) ORDER BY title",
     [student.cohortId, major],
   );
 
   return (
     <>
-      <form className="flex flex-col gap-3 sm:flex-row sm:items-end" method="get">
-        <div className="flex-1">
-          <label className="text-sm tracking-wider text-[#dbe3f5] sm:text-base" htmlFor="major">CHOOSE YOUR MAJOR</label>
-          <select className="mt-3 h-13 w-full rounded-full bg-white px-5 text-sm text-[#14182a] outline-none focus-visible:ring-4 focus-visible:ring-[#22d8e5] sm:px-6 sm:text-base" defaultValue={major} id="major" name="major">
-            {MAJORS.map((item) => <option key={item}>{item}</option>)}
-          </select>
-        </div>
-        <button className="h-13 rounded-full bg-[#22d8e5] px-6 font-semibold text-[#071127] hover:bg-white" type="submit">Show resources</button>
-      </form>
+      <MajorSelector major={major} />
 
       <div className="mt-8 flex items-end justify-between gap-4"><div><p className="text-xs tracking-[0.24em] text-[#22d8e5]">COURSE LIBRARY</p><h2 className="mt-2 text-2xl font-medium sm:text-3xl">Lesson summaries</h2></div><p className="hidden text-sm text-[#c9d2ea] sm:block">{result.rowCount} resources</p></div>
       {result.rows.length === 0 ? (

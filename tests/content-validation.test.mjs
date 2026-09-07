@@ -8,7 +8,8 @@ function validForm() {
   form.set("description", "A useful summary.");
   form.set("imageUrl", "https://example.com/image.png");
   form.set("resourceUrl", "https://example.com/summary.pdf");
-  form.set("major", "Computer Science");
+  form.append("majors", "Computer Science");
+  form.append("majors", "Data Science");
   return form;
 }
 
@@ -25,6 +26,6 @@ test("rejects invalid content at the boundary", () => {
   form.set("resourceUrl", "file:///etc/passwd");
   assert.deepEqual(validateContent(form, "course"), { ok: false, error: "Enter a valid HTTP or HTTPS resource URL." });
   form.set("resourceUrl", "https://example.com/summary.pdf");
-  form.set("major", "Unknown");
-  assert.deepEqual(validateContent(form, "course"), { ok: false, error: "Choose a valid major." });
+  form.append("majors", "Unknown");
+  assert.deepEqual(validateContent(form, "course"), { ok: false, error: "Choose at least one valid major." });
 });
