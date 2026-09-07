@@ -60,4 +60,14 @@ npm test
 npm run build
 ```
 
+## Production Image
+
+Pushes to `main` run migrations and tests against PostgreSQL, lint and build the application, then publish a production image to:
+
+```text
+ghcr.io/joshualarido/himti-kit-legacy-bridge:prod
+```
+
+The image listens on port `3000`, runs database migrations before startup, and requires `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD` at runtime. It is intended to run behind a reverse proxy and should not publish port `3000` directly to the internet.
+
 See [docs/plan.md](docs/plan.md) for the development plan.
